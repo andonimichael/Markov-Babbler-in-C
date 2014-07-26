@@ -2,7 +2,7 @@
 
 .PHONY: clean
 
-SRC = messages.c debug.c infastructure.c insert.c babble.c main.c
+SRC = messages.c print.c infastructure.c insert.c babble.c main.c
 
 markov: markov.h $(SRC)
 	gcc -Wall -o markov $(SRC) -lm
