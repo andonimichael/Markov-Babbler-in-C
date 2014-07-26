@@ -1,38 +1,46 @@
-/* Andoni Garcia's Markov Babbler. 2014. */
+// Andoni Garcia's Markov Babbler. 2014.
 
 #include "markov.h"
 
 int main(int argc, char *argv[])
 {
-  printf("                         ~~~ Welcome to Andoni's Markov Babbler ~~~\n");
-  printf("\n\n\tThis program will use Markov Modeling to write sentences and paragraphs using\nprobability analysis of words and their adjacent words from given input files. As such you\nmust input at least one file (preferably a text file of decent size to give the most\naccurate word predictions) for the Markov Babbler to read before it can begin constructing\ncoherent-ish sentences. The babbler uses a pseudo-random process to grab next words, so\nevery time you run the babbler on the same input file(s), it should produce new and unique\noutputs. Be warned though, there is a high probability that if your text file contains loops\nbetween next words (i.e. it says \"then I\" and later says \"I then\") the babbler might get\ncaught in unwanted loops. Have fun!\n");
-  printf("============================================================================================\n");
-  
-  // Creates a new hash table
+  int paragraphs, sentences, tsize = 157, pflag = 0, hflag = 0;
   htable *table;
-  table = new_htable(51);
-
-  srand(time(NULL));
-
-  // Parses through a given input file
-  char file[127];
-  printf("\nWhich file do you want to upload? ");
-  scanf("%s", file);
   FILE *upload;
-  upload = fopen(file, "r");
-  if(upload == NULL){
-    printf("Error: Problem uploading file %s", file);
-    exit(0);
-  }
-  table = insert_file(upload, table);
-  fclose(upload);
+  char file[127], answer[127];
 
-  // Allows the user to upload multiple files
-  char answer[127];
-  printf("Do you want to insert another file? (yes/no): ");
-  scanf("%s", answer);
+  // Handles the flag options.
+  system("clear");
+  int opt;
+  while((opt = getopt(argc, argv, "hpds:")) != -1)
+    switch(opt){
+    case 'h': hflag = 1; break;
+    case 'p': pflag = 1; break;
+    case 's': tsize = atoi(optarg); break;
+    case '?': 
+      if(optopt == 'c')
+	printf("The flag -%c needs an integer to follow to set the hash table size. Please re-run the program either ommiting -%c or including the argument.\n", optopt, optopt);
+      else if(isprint(optopt))
+	printf("The flag -%c is not recognized. Please re-run the program with the flag '-h' to call the help menu.\n", optopt);
+      else
+	printf("The option '0x%x' is not recognizes. Please re-run the program with the flag '-h' to call the help menu.\n", optopt);
+      return 1;
+    default: exit(0);
+    }
+  if(hflag == 1)
+    flag_help();
+
+  // Initializations
+  msg_welcome();
+  msg_intro();
+  srand(time(NULL));
+  table = new_htable(tsize);
+
+  // Inserts files into the table
+  newline();
+  strcpy(answer, "yes");
   while(!strcmp(answer, "yes") || !strcmp(answer, "Yes")){
-    printf("\nWhich file do you want to upload? ");
+    msg_file1();
     scanf("%s", file);
     upload = fopen(file, "r");
     if(upload == NULL){
@@ -41,36 +49,31 @@ int main(int argc, char *argv[])
     }
     table = insert_file(upload, table);
     fclose(upload);
-    printf("\nDo you want to insert another file? (yes/no): ");
+    msg_file2();
     scanf("%s", answer);
+    if(isbadanswer(answer))
+      strcpy(answer, fixbadanswer(answer, msg_file2));
   }
+  if(pflag == 1)
+    flag_print(table);
 
   // Performs the babbling
-  int paragraphs, sentences;
-  printf("\n\nHow many paragraphs do you want to write? ");
-  scanf("%d", &paragraphs);
-  printf("\nHow many sentences per paragraph do you want to write? ");
-  scanf("%d", &sentences);
-  system("clear");
-  printf("Babble>\n");
-  babble(paragraphs, sentences, table);
-
-  // Allows multiple runs
-  printf("\n\nDo you want to babble more? (yes/no): ");
-  scanf("%s", answer);
+  newline();
+  strcpy(answer, "yes");
   while(!strcmp(answer, "yes") || !strcmp(answer, "Yes")){
-    printf("\nHow many paragraphs do you want to write? ");
+    msg_babble1();
     scanf("%d", &paragraphs);
-    printf("\nHow many sentences per paragraph do you want to write? ");
+    msg_babble2();
     scanf("%d", &sentences);
-    system("clear");
-    printf("Babble>\n");
+    msg_babble();
     babble(paragraphs, sentences, table);
-    printf("\n\nDo you want to babble more? (yes/no): ");
+    msg_babble3();
     scanf("%s", answer);
-    }
+    if(isbadanswer(answer))
+      strcpy(answer, fixbadanswer(answer, msg_babble3));
+  }
 
   // Exit procedure
-  printf("\nBye!\n");
+  msg_exit();
   return 0;
 }
