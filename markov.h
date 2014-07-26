@@ -96,6 +96,13 @@ int htable_mem(char *s, htable *t);
 ##############################################################################
 ############################################################################*/
 
+// Checks if the word is the end of the sentence.
+int end_of_sent(char *s);
+
+// Checks if the word is "printable" (in our sense as in alphanumeric or '-'
+// character).
+int printable(char *s);
+
 // Cleans up non-alpha-numeric characters
 char *str_cleanup(char *s);
 
@@ -132,3 +139,42 @@ void paragraph(htable *t, int len);
 
 // Writes the babble to the stdout
 void babble(int paragraphs, int sentences, htable *t);
+
+
+/*############################################################################
+##############################################################################
+##########################          DEBUG.C        ###########################
+##############################################################################
+############################################################################*/
+
+void print_list(list *l);
+void print_entry(entry *e);
+void print_bucket(bucket *b);
+void print_htable(htable *t);
+
+
+/*############################################################################
+##############################################################################
+##########################        MESSAGES.C       ###########################
+##############################################################################
+############################################################################*/
+
+void newline();
+int isbadanswer(char *answer);
+char *fixbadanswer(char *answer, void (*func)());
+void flag_help();
+void flag_print();
+void msg_welcome();
+void msg_intro();
+void msg_file1();
+void msg_file2();
+void msg_babble1();
+void msg_babble2();
+void msg_babble3();
+void msg_babble();
+void msg_help1();
+void msg_help2();
+void msg_continue();
+void msg_badinput();
+void msg_print();
+void msg_exit();
