@@ -136,7 +136,7 @@ void msg_help1()
 
 void msg_help2()
 {
-  printf("\nThis program has four (4) option flags that you can include when you run the program:\n -h: This calls this exact help message.\n -p: This prints out a copy of the hash table instead of babbling.\n -d: This runs the program in debugging mode.\n -s [int]: This specifies the size of the hash table. It requires an integer argument to follow after the flag. For hash tables, it is optimal to use a prime number when choosing the size. If no size flag is specified, it will default to 157 buckets. This may be too large or too small for your input files though.\n");
+  printf("\nThis program has three (3) option flags that you can include when you run the program:\n -h: This calls this exact help message.\n -p: This prints out a copy of the hash table instead of babbling.\n -s [int]: This specifies the size of the hash table. It requires an integer argument to follow after the flag. For hash tables, it is optimal to use a prime number when choosing the size. If no size flag is specified, it will default to 157 buckets. This may be too large or too small for your input files though.\n");
   printf("\nIf you have more questions, feel free to e-mail me at garcia_andoni@yahoo.com\n");
   return;
 }
