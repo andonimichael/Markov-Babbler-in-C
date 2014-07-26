@@ -18,7 +18,7 @@ char *next_word(entry *e)
 
 char *first_word(htable *t)
 {
-  int checks = rand() % 5;
+  int checks = (rand() % 5) + 1;
   int randnum = rand() % t->n_buckets;
   bucket *buckets = t->buckets[randnum];
   char *firstword;
@@ -27,8 +27,14 @@ char *first_word(htable *t)
     if('A' <= tmp[0] && tmp[0] <= 'Z'){
       checks--;
       firstword = tmp;
-      buckets = buckets->next;
-      continue;
+      if(buckets->next == NULL){
+	int randnum = rand() % t->n_buckets;
+	buckets = t->buckets[randnum];
+	continue;
+      } else {
+	buckets = buckets->next;
+	continue;
+      }
     }
     if(buckets->next == NULL){
       int randnum = rand() % t->n_buckets;
@@ -65,8 +71,9 @@ void sentence(htable *t)
   int i;
   for(i = 0; i < buff; i++)
     sentence[i] = '\0';
-
-  int words = (rand() % 20);
+  int words = (rand() % 20) + 1;
+  while(words == 1)
+    words = (rand() % 20) + 1;
   // Creates the sentence
   char *first = first_word(t);
   entry *e = htable_search(t, first);
@@ -78,16 +85,19 @@ void sentence(htable *t)
     }
     strcat(sentence, e->word);
     j += strlen(e->word);
-    if(words != 1)
+    if(words > 0)
       sentence[j] = ' ';
     j++;
     char *next = next_word(e);
+    if(!strcmp(next, "EOS"))
+      break;
     e = htable_search(t, next);
     words--;
   }
-  printf("%s. ", sentence);
+  sentence[--j] = '.';
+  printf("%s ", sentence);
   free(sentence);
-  printf("\n");
+  //printf("\n");
   return;
 }
   
