@@ -2,6 +2,30 @@
 
 #include "markov.h"
 
+// Checks if the word is the end of the sentence.
+int end_of_sent(char *s)
+{
+  int len = strlen(s);
+  char lastchar = s[len - 1];
+  if(lastchar == '.' || lastchar == '?' || lastchar == '!')
+    return 1;
+  return 0;
+}
+
+// Checks if the word is "printable" (in our sense as in alphanumeric or '-'
+// character).
+int printable(char *s)
+{
+  int len = strlen(s);
+  int i;
+  for(i = 0; i < len; i++){
+    unsigned char c = s[i];
+    if(isalpha(c) || isdigit(c) || c == '-')
+      return 1;
+  }
+  return 0;
+}
+
 // Cleans up non-alpha-numeric characters
 char *str_cleanup(char *s)
 {
@@ -23,10 +47,10 @@ char *str_cleanup(char *s)
   }
   // Ending the new string and returning the appropriate answer.
   newstr[ct] = '\0';
-  if(strlen(newstr) == 0)
-    return "ERROR";
   return strdup(newstr);
 }
+
+
 
 // Inserts words from a file into the hash table
 htable *insert_file(FILE *upload, htable *table)
@@ -35,15 +59,39 @@ htable *insert_file(FILE *upload, htable *table)
   // Creates and intiializes my two buffers
   char current_word[MAX_WORD];
   char next_word[MAX_WORD];
-
+  
+  // Grabs the first word of the document
   fscanf(upload, "%s", current_word);
+  // Keeps grabbing until it gets a "printable" word
+  while(!printable(current_word))
+    fscanf(upload, "%s", current_word);
+  // Now grabs the next word.
   while(fscanf(upload, "%s", next_word) == 1){
-    char *tmp1, *tmp2;
-    tmp1 = str_cleanup(current_word);
-    tmp2 = str_cleanup(next_word);
-    table = htable_insert(table, tmp1, tmp2);
-    strcpy(current_word, next_word);
+    // Keeps grabbing until it gets a "printable" next word.
+    while(!printable(next_word))
+      fscanf(upload, "%s", next_word);
+    // Checks if the current word is an end of the sentence word.
+    if(end_of_sent(current_word)){
+      // If so, it inserts the next word as EOS and then uses the next
+      // word as a first word for the next iteration.
+      char *tmp = str_cleanup(current_word);
+      table = htable_insert(table, tmp, "EOS");
+      free(tmp);
+      strcpy(current_word, next_word);
+      continue;
+    } else {
+      // Else inserts normally
+      char *tmp1 = str_cleanup(current_word);
+      char *tmp2 = str_cleanup(next_word);
+      table = htable_insert(table, tmp1, tmp2);
+      free(tmp1);
+      free(tmp2);
+      strcpy(current_word, next_word);
+    }
   }
+  char *tmp3 = str_cleanup(current_word);
+  table = htable_insert(table, tmp3, "EOS");
+  free(tmp3);
   printf("The file was sucessfully uploaded!\n\n");
   
   return table;
