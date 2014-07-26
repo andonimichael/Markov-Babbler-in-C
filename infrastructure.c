@@ -1,12 +1,10 @@
-/* Andoni Garcia's Markov Babbler. 2014. */
+// Andoni Garcia's Markov Babbler. 2014.
 
 #include "markov.h"
 
 /* The hash function for a given string */
 unsigned long long int hashfn(char *word)
 {
-  
-
   unsigned long long int res = 17;
   long int len = strlen(word);
   long int i;
